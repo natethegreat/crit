@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crit</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 8' shape-rendering='crispEdges'%3E%3Cstyle%3E.o{fill:%231a1a1e}.s{fill:%23fff}@media(prefers-color-scheme:dark){.o{fill:%23fafafa}.s{fill:%2318181b}}%3C/style%3E%3Cpath class='o' d='M1,0h4v1h-4zM0,1h1v6h-1zM5,1h1v4h-1zM4,5h1v1h-1zM3,6h1v1h-1zM1,7h2v1h-2zM8,0h4v1h-4zM7,1h1v4h-1zM12,1h1v6h-1zM8,5h1v1h-1zM9,6h1v1h-1zM10,7h2v1h-2z'/%3E%3Cpath class='s' d='M1,1h4v1h-4zM1,2h4v2h-4zM1,4h4v1h-4zM1,5h3v1h-3zM1,6h2v1h-2zM8,1h4v1h-4zM8,2h4v2h-4zM8,4h4v1h-4zM9,5h3v1h-3zM10,6h2v1h-2z'/%3E%3Cpath class='o' d='M3,3h2v2h-2zM10,3h2v2h-2z'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --bg-primary: #f9f9fb;
+      --bg-secondary: #ffffff;
+      --bg-tertiary: #f0f0f3;
+      --bg-popover: #ffffff;
+      --border: #e8e8ec;
+      --border-light: #d4d4da;
+      --text-primary: #1a1a1e;
+      --text-secondary: #6b6b76;
+      --text-muted: #9c9ca6;
+      --accent: #E60023;
+      --accent-hover: #CC001F;
+      --pin-color: #E60023;
+      --badge-color: #E60023;
+      --success: #6b6b76;
+      --error: #E60023;
+      --shadow-pin: drop-shadow(0 2px 6px rgba(0,0,0,0.12));
+      --shadow-popover: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+      --overlay-footer: rgba(0,0,0,0.04);
+      --overlay-modal: rgba(0,0,0,0.4);
+      --delete-hover-bg: rgba(239, 68, 68, 0.1);
+      --canvas-fallback-bg: #f0f0f3;
+      --border-hover: rgba(0,0,0,0.2);
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0f0f11;
+      --bg-secondary: #18181b;
+      --bg-tertiary: #27272a;
+      --bg-popover: #2a2a2e;
+      --border: #27272a;
+      --border-light: #3f3f46;
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #E60023;
+      --accent-hover: #CC001F;
+      --pin-color: #E60023;
+      --badge-color: #E60023;
+      --success: #a1a1aa;
+      --error: #E60023;
+      --shadow-pin: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+      --shadow-popover: 0 8px 32px rgba(0,0,0,0.5);
+      --overlay-footer: rgba(0,0,0,0.2);
+      --overlay-modal: rgba(0,0,0,0.8);
+      --delete-hover-bg: rgba(239, 68, 68, 0.15);
+      --canvas-fallback-bg: #1a1a2e;
+      --border-hover: rgba(255,255,255,0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    body, .header, .btn, .screenshot-area, .comment-popover,
+    .comment-popover-footer, .existing-comment-footer, .modal,
+    .modal-overlay, .modal-header, .modal-body, .modal-footer,
+    .copy-box, .copy-btn, .popover-action-btn, .submit-btn,
+    .comment-action-btn, .comment-input, .screenshot-info {
+      transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg-primary);
+      z-index: 100;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logo .logo-brow {
+      opacity: 0;
+      transform: translateY(2px);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .logo:hover .logo-brow {
+        opacity: 1;
+        animation: raise-brow 0.15s steps(2) forwards;
+      }
+
+      @keyframes raise-brow {
+        from { transform: translateY(2px); }
+        to { transform: translateY(-2px); }
+      }
+    }
+
+    .header-stats {
+      display: flex;
+      gap: 16px;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .stat-badge.has-comments {
+      color: var(--pin-color);
+      font-weight: 500;
+    }
+
+    .stat-badge.clickable {
+      cursor: pointer;
+      border-radius: 4px;
+      padding: 2px 6px;
+      margin: -2px -6px;
+    }
+
+    .stat-badge.clickable:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .header-right {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      transition: all 0.15s;
+    }
+
+    .btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+      color: white;
+    }
+
+    /* Main Content */
+    .main-content {
+      padding: 24px;
+    }
+
+    .flow-section {
+      margin-bottom: 32px;
+    }
+
+    .flow-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .screenshots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 12px;
+    }
+
+    /* Screenshot Card */
+    .screenshot-card {
+      background: transparent;
+      border-radius: 12px;
+      overflow: visible;
+      position: relative;
+    }
+
+    .screenshot-container {
+      position: relative;
+      border-radius: 12px;
+    }
+
+    .screenshot-area {
+      background: var(--bg-tertiary);
+      position: relative;
+      cursor: crosshair;
+      border: 1px solid transparent;
+      border-radius: 12px;
+      transition: border-color 0.15s, background 0.2s;
+      overflow: visible;
+    }
+
+    .screenshot-card:hover .screenshot-area {
+      border-color: var(--border-hover);
+    }
+
+    .screenshot-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      color: var(--text-muted);
+    }
+
+    .screenshot-placeholder .icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+      opacity: 0.5;
+    }
+
+    .screenshot-info {
+      padding: 8px 4px;
+    }
+
+    .screenshot-name {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .screenshot-state {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* Pins */
+    .pin {
+      position: absolute;
+      transform: translate(0, -100%);
+      cursor: pointer;
+      z-index: 10;
+      filter: var(--shadow-pin);
+    }
+
+    .pin-dot {
+      width: 28px;
+      height: 28px;
+      background: var(--pin-color);
+      border-radius: 50% 50% 50% 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.15s;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .pin:hover .pin-dot {
+      transform: scale(1.1);
+    }
+
+    /* Comment Popover - Dark theme */
+    .comment-popover {
+      position: absolute;
+      width: 340px;
+      background: var(--bg-popover);
+      border-radius: 12px;
+      box-shadow: var(--shadow-popover);
+      z-index: 1000;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .comment-popover.shake {
+      animation: shake 0.4s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      15% { transform: translateX(-6px); }
+      30% { transform: translateX(5px); }
+      45% { transform: translateX(-4px); }
+      60% { transform: translateX(3px); }
+      75% { transform: translateX(-2px); }
+    }
+
+    .comment-popover-content {
+      padding: 16px;
+    }
+
+    .comment-input {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      font-size: 15px;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      min-height: 28px;
+      max-height: 150px;
+    }
+
+    .comment-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    /* Reference image preview */
+    .reference-preview {
+      margin-top: 12px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .reference-preview img {
+      max-width: 140px;
+      max-height: 100px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: block;
+    }
+
+    .remove-reference {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      width: 24px;
+      height: 24px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .remove-reference:hover {
+      background: var(--error);
+      border-color: var(--error);
+    }
+
+    .comment-popover-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--overlay-footer);
+    }
+
+    .popover-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .popover-action-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.15s;
+    }
+
+    .popover-action-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .popover-action-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .submit-btn {
+      width: 36px;
+      height: 36px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      transition: all 0.15s;
+    }
+
+    .submit-btn:hover {
+      background: var(--accent-hover);
+    }
+
+    .submit-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+    }
+
+    /* Existing comment popover */
+    .existing-comment-content {
+      padding: 16px;
+    }
+
+    .existing-comment-text {
+      color: var(--text-primary);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .existing-comment-reference {
+      margin-top: 12px;
+    }
+
+    .existing-comment-reference img {
+      max-width: 140px;
+      max-height: 100px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .existing-comment-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      background: var(--overlay-footer);
+    }
+
+    .comment-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .comment-actions-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .comment-action-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: all 0.15s;
+    }
+
+    .comment-action-btn:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .comment-action-btn.delete {
+      color: var(--text-muted);
+    }
+
+    .comment-action-btn.delete:hover {
+      background: var(--delete-hover-bg);
+      color: var(--error);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--overlay-modal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s;
+    }
+
+    .modal-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      max-width: 480px;
+      width: 90%;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 20px;
+      line-height: 1;
+      padding: 4px;
+    }
+
+    .close-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 20px;
+    }
+
+    .modal-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .export-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      color: var(--text-secondary);
+      font-size: 14px;
+    }
+
+    .export-item .check {
+      color: var(--success);
+    }
+
+    .copy-box {
+      background: var(--bg-tertiary);
+      border-radius: 6px;
+      padding: 12px 60px 12px 12px;
+      font-family: "SF Mono", Monaco, monospace;
+      font-size: 13px;
+      margin-top: 12px;
+      position: relative;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 10px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .copy-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .hidden-input {
+      display: none;
+    }
+
+    /* Image Preview Modal */
+    .image-preview-container {
+      position: relative;
+      max-width: 90vw;
+      max-height: 90vh;
+    }
+
+    .image-preview-container img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 8px;
+      box-shadow: var(--shadow-popover);
+    }
+
+    .image-preview-close {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      width: 32px;
+      height: 32px;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .image-preview-close:hover {
+      background: var(--error);
+      border-color: var(--error);
+    }
+
+    .reference-preview img {
+      cursor: pointer;
+    }
+
+    .reference-preview img:hover {
+      opacity: 0.9;
+    }
+
+    .existing-comment-reference img {
+      cursor: pointer;
+    }
+
+    .existing-comment-reference img:hover {
+      opacity: 0.9;
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .theme-toggle svg {
+      width: 18px;
+      height: 18px;
+      position: absolute;
+      transition: opacity 0.2s, transform 0.3s;
+    }
+
+    .theme-toggle .icon-sun {
+      opacity: 0;
+      transform: rotate(90deg) scale(0.5);
+    }
+
+    .theme-toggle .icon-moon {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+
+    [data-theme="dark"] .theme-toggle .icon-sun {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+
+    [data-theme="dark"] .theme-toggle .icon-moon {
+      opacity: 0;
+      transform: rotate(-90deg) scale(0.5);
+    }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      color: var(--text-muted);
+    }
+
+    /* Comments list modal */
+    .comments-list-screen {
+      margin-bottom: 20px;
+    }
+
+    .comments-list-screen:last-child {
+      margin-bottom: 0;
+    }
+
+    .comments-list-screen-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comments-list-item {
+      display: flex;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .comments-list-pin {
+      width: 24px;
+      height: 24px;
+      background: var(--accent);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .comments-list-text {
+      flex: 1;
+      padding-top: 2px;
+    }
+
+    .comments-list-empty {
+      color: var(--text-muted);
+      text-align: center;
+      padding: 24px;
+    }
+  </style>
+  <script>
+    // Theme initialization — runs before paint to prevent flash
+    (function() {
+      var stored = localStorage.getItem('crit-theme');
+      if (stored) {
+        if (stored === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <header class="header">
+    <div class="header-left">
+      <span class="logo"><svg width="29" height="18" viewBox="0 0 13 8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="overflow:visible"><path fill="currentColor" d="M1,0h4v1h-4zM0,1h1v6h-1zM5,1h1v4h-1zM4,5h1v1h-1zM3,6h1v1h-1zM1,7h2v1h-2zM8,0h4v1h-4zM7,1h1v4h-1zM12,1h1v6h-1zM8,5h1v1h-1zM9,6h1v1h-1zM10,7h2v1h-2z"/><path style="fill:var(--bg-secondary)" d="M1,1h4v1h-4zM1,2h4v2h-4zM1,4h4v1h-4zM1,5h3v1h-3zM1,6h2v1h-2zM8,1h4v1h-4zM8,2h4v2h-4zM8,4h4v1h-4zM9,5h3v1h-3zM10,6h2v1h-2z"/><g id="logo-pupils"><path fill="currentColor" d="M2,2h2v2h-2zM9,2h2v2h-2z"/></g><path class="logo-brow" fill="currentColor" d="M1,-1h4v1h-4z"/></svg>Crit</span>
+      <div class="header-stats">
+        <span class="stat-badge" id="states-count">0 captures</span>
+        <span class="stat-badge clickable" id="comments-count">0 comments</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn theme-toggle" id="theme-toggle" title="Toggle theme">
+        <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn btn-secondary" id="reset-btn">Clear Comments</button>
+      <button class="btn btn-primary" id="export-btn">Save</button>
+    </div>
+  </header>
+
+  <main class="main-content" id="main-content">
+    <div class="loading" id="loading">Loading screenshots...</div>
+    <div id="grid-container"></div>
+  </main>
+
+  <div class="modal-overlay" id="export-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Feedback Saved</span>
+        <button class="close-btn" id="close-export-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="export-summary"></div>
+        <div style="margin-top: 16px; color: var(--text-secondary); font-size: 13px;">
+          Copy this prompt and paste it into your coding agent:
+        </div>
+        <div class="copy-box">
+          review .crit and fix each issue
+          <button class="copy-btn" id="copy-command">Copy</button>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="done-btn">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" accept="image/*" class="hidden-input" id="reference-input">
+
+  <div class="modal-overlay" id="comments-modal">
+    <div class="modal" style="max-width: 560px; max-height: 80vh; display: flex; flex-direction: column;">
+      <div class="modal-header">
+        <span class="modal-title">All Comments</span>
+        <button class="close-btn" id="close-comments-modal">&times;</button>
+      </div>
+      <div class="modal-body" id="comments-modal-body" style="overflow-y: auto; flex: 1;">
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="image-preview-modal">
+    <div class="image-preview-container">
+      <button class="image-preview-close">&times;</button>
+      <img id="image-preview-img" src="" alt="Preview">
+    </div>
+  </div>
+
+  <script>
+    // SVG icons
+    const icons = {
+      smile: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>`,
+      at: `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg>`,
+      image: `<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>`,
+      arrowUp: `<svg viewBox="0 0 24 24"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>`
+    };
+
+    // State
+    let manifest = null;
+    let comments = {};
+    let activePopover = null;
+    let pendingPin = null;
+    let hasUnsavedChanges = false;
+    let dismissWarningShown = false;
+    let ignoreNextClick = false;
+
+    function storageKey() {
+      const id = manifest && manifest.capturedAt ? manifest.capturedAt : 'unknown';
+      return `crit-comments-${id}`;
+    }
+
+    function loadComments() {
+      const saved = localStorage.getItem(storageKey());
+      if (saved) {
+        comments = JSON.parse(saved);
+      }
+    }
+
+    function saveComments() {
+      localStorage.setItem(storageKey(), JSON.stringify(comments));
+      updateCounts();
+    }
+
+    const gridContainer = document.getElementById('grid-container');
+    const loading = document.getElementById('loading');
+    const statesCount = document.getElementById('states-count');
+    const commentsCount = document.getElementById('comments-count');
+    const exportModal = document.getElementById('export-modal');
+    const exportSummary = document.getElementById('export-summary');
+    const referenceInput = document.getElementById('reference-input');
+    const imagePreviewModal = document.getElementById('image-preview-modal');
+    const imagePreviewImg = document.getElementById('image-preview-img');
+
+    function showImagePreview(src) {
+      imagePreviewImg.src = src;
+      imagePreviewModal.classList.add('visible');
+    }
+
+    function hideImagePreview() {
+      imagePreviewModal.classList.remove('visible');
+    }
+
+    imagePreviewModal.addEventListener('click', (e) => {
+      if (e.target === imagePreviewModal || e.target.classList.contains('image-preview-close')) {
+        hideImagePreview();
+      }
+    });
+
+    document.querySelector('.image-preview-close').addEventListener('click', hideImagePreview);
+
+    // Comments list modal
+    const commentsModal = document.getElementById('comments-modal');
+    const commentsModalBody = document.getElementById('comments-modal-body');
+
+    function showCommentsModal() {
+      const totalComments = getTotalCommentCount();
+      if (totalComments === 0) {
+        commentsModalBody.innerHTML = '<div class="comments-list-empty">No comments yet</div>';
+      } else {
+        let html = '';
+
+        // Iterate in manifest order
+        if (manifest && manifest.captures) {
+          manifest.captures.forEach((capture, index) => {
+            const captureId = getCaptureId(index);
+            const captureComments = comments[captureId];
+
+            if (!captureComments || captureComments.length === 0) return;
+
+            const filename = capture.image.split('/').pop().replace('.png', '');
+            html += `<div class="comments-list-screen">`;
+            html += `<div class="comments-list-screen-name">${filename}</div>`;
+
+            captureComments.forEach((comment, i) => {
+              const globalPin = getGlobalPinNumber(captureId, i);
+              html += `
+                <div class="comments-list-item">
+                  <div class="comments-list-pin">${globalPin}</div>
+                  <div class="comments-list-text">${escapeHtml(comment.text) || '<em style="color: var(--text-muted);">Image only</em>'}</div>
+                </div>
+              `;
+            });
+
+            html += `</div>`;
+          });
+        }
+
+        commentsModalBody.innerHTML = html;
+      }
+
+      commentsModal.classList.add('visible');
+    }
+
+    commentsCount.addEventListener('click', () => {
+      showCommentsModal();
+    });
+
+    document.getElementById('close-comments-modal').addEventListener('click', () => {
+      commentsModal.classList.remove('visible');
+    });
+
+    commentsModal.addEventListener('click', (e) => {
+      if (e.target === commentsModal) {
+        commentsModal.classList.remove('visible');
+      }
+    });
+
+    async function fetchManifest() {
+      try {
+        const res = await fetch('/api/manifest');
+        manifest = await res.json();
+        loading.style.display = 'none';
+        loadComments();
+        renderGrid();
+        updateCounts();
+      } catch (e) {
+        loading.textContent = 'Failed to load manifest. Is the server running?';
+        console.error(e);
+      }
+    }
+
+    function updateCounts() {
+      if (!manifest) return;
+
+      const totalCaptures = manifest.captures ? manifest.captures.length : 0;
+
+      let totalComments = 0;
+      Object.values(comments).forEach(arr => {
+        totalComments += arr.length;
+      });
+
+      statesCount.textContent = `${totalCaptures} capture${totalCaptures !== 1 ? 's' : ''}`;
+      commentsCount.textContent = `${totalComments} comment${totalComments !== 1 ? 's' : ''}`;
+      commentsCount.classList.toggle('has-comments', totalComments > 0);
+    }
+
+    function getCaptureId(index) {
+      return `capture-${index}`;
+    }
+
+    // Get global pin number (across all captures)
+    function getGlobalPinNumber(captureId, localIndex) {
+      let globalIndex = 0;
+
+      // Count all comments before this capture (in order of captures in manifest)
+      if (manifest && manifest.captures) {
+        for (let i = 0; i < manifest.captures.length; i++) {
+          const id = getCaptureId(i);
+          if (id === captureId) {
+            // This is our capture, add the local index
+            return globalIndex + localIndex + 1;
+          }
+          // Add all comments from this capture
+          if (comments[id]) {
+            globalIndex += comments[id].length;
+          }
+        }
+      }
+
+      return localIndex + 1;
+    }
+
+    function getTotalCommentCount() {
+      return Object.values(comments).reduce((sum, arr) => sum + arr.length, 0);
+    }
+
+    function renderGrid() {
+      if (!manifest || !manifest.captures) return;
+
+      gridContainer.innerHTML = '';
+      const grid = document.createElement('div');
+      grid.className = 'screenshots-grid';
+
+      manifest.captures.forEach((capture, index) => {
+        const card = createCaptureCard(capture, index);
+        grid.appendChild(card);
+      });
+
+      gridContainer.appendChild(grid);
+    }
+
+    function createCaptureCard(capture, index) {
+      const card = document.createElement('div');
+      card.className = 'screenshot-card';
+      const captureId = getCaptureId(index);
+      card.dataset.captureId = captureId;
+
+      const captureComments = comments[captureId] || [];
+
+      // Derive display name from filename (e.g. "screenshots/003.png" -> "003")
+      const filename = capture.image.split('/').pop().replace('.png', '');
+
+      card.innerHTML = `
+        <div class="screenshot-container">
+          <div class="screenshot-area" data-capture-id="${captureId}">
+            <img src="/${capture.image}" style="width:100%;height:auto;display:block;border-radius:12px;">
+          </div>
+        </div>
+        <div class="screenshot-info">
+          <div class="screenshot-name">${filename}</div>
+        </div>
+      `;
+
+      const screenshotArea = card.querySelector('.screenshot-area');
+
+      // Add existing pins with global numbers
+      captureComments.forEach((comment, i) => {
+        const globalNum = getGlobalPinNumber(captureId, i);
+        const pin = createPinElement(comment.x, comment.y, i, captureId, globalNum);
+        screenshotArea.appendChild(pin);
+      });
+
+      screenshotArea.addEventListener('click', (e) => {
+        if (e.target.closest('.pin')) return;
+
+        // Check if there's an active popover with unsaved content
+        if (activePopover) {
+          const popState = activePopover.element.getUnsavedState ? activePopover.element.getUnsavedState() : { hasText: false, hasImage: false };
+          const hasContent = popState.hasText || popState.hasImage;
+          if (hasContent && !dismissWarningShown) {
+            // Shake to warn about unsaved content
+            activePopover.element.classList.add('shake');
+            setTimeout(() => {
+              if (activePopover) {
+                activePopover.element.classList.remove('shake');
+              }
+            }, 400);
+            dismissWarningShown = true;
+            return; // Don't open new comment
+          }
+        }
+
+        const rect = screenshotArea.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+        closeActivePopover();
+
+        // Get next global pin number
+        const localIndex = comments[captureId]?.length || 0;
+        const nextPinNumber = getGlobalPinNumber(captureId, localIndex);
+        showNewCommentPopover(captureId, x, y, screenshotArea, e.clientX, e.clientY, nextPinNumber);
+      });
+
+      return card;
+    }
+
+    function createPinElement(x, y, index, captureId, pinNumber) {
+      const pin = document.createElement('div');
+      pin.className = 'pin';
+      pin.style.left = `${x}%`;
+      pin.style.top = `${y}%`;
+      pin.dataset.index = index;
+      pin.innerHTML = `<div class="pin-dot">${pinNumber}</div>`;
+
+      pin.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeActivePopover();
+        showExistingCommentPopover(captureId, index, pin, pinNumber);
+      });
+
+      return pin;
+    }
+
+    function showNewCommentPopover(captureId, x, y, screenshotArea, clickX, clickY, pinNumber) {
+      const tempPin = document.createElement('div');
+      tempPin.className = 'pin';
+      tempPin.style.left = `${x}%`;
+      tempPin.style.top = `${y}%`;
+      tempPin.innerHTML = `<div class="pin-dot">${pinNumber}</div>`;
+      screenshotArea.appendChild(tempPin);
+
+      pendingPin = { captureId, x, y, tempPin };
+      // Don't set hasUnsavedChanges yet - only when user types or adds image
+
+      const popover = createCommentPopover('', null, (text, reference) => {
+        if (!comments[captureId]) {
+          comments[captureId] = [];
+        }
+        comments[captureId].push({
+          pin: pinNumber,
+          text,
+          x,
+          y,
+          reference
+        });
+        saveComments();
+        closeActivePopover();
+        renderGrid();
+      }, () => {
+        tempPin.remove();
+        pendingPin = null;
+        closeActivePopover();
+      });
+
+      positionPopover(popover, clickX, clickY);
+      document.body.appendChild(popover);
+      activePopover = { element: popover, captureId };
+
+      setTimeout(() => {
+        popover.querySelector('.comment-input').focus();
+      }, 50);
+    }
+
+    function showExistingCommentPopover(captureId, index, pinElement, pinNumber) {
+      const comment = comments[captureId][index];
+      const rect = pinElement.getBoundingClientRect();
+
+      const popover = createExistingPopover(comment, pinNumber,
+        () => {
+          closeActivePopover();
+          showEditCommentPopover(captureId, index, pinElement, pinNumber);
+        },
+        () => {
+          comments[captureId].splice(index, 1);
+          comments[captureId].forEach((c, i) => c.pin = i + 1);
+          if (comments[captureId].length === 0) {
+            delete comments[captureId];
+          }
+          saveComments();
+          closeActivePopover();
+          renderGrid();
+        }
+      );
+
+      positionPopover(popover, rect.left + rect.width / 2, rect.top);
+      document.body.appendChild(popover);
+      activePopover = { element: popover, captureId, pinIndex: index };
+    }
+
+    function showEditCommentPopover(captureId, index, pinElement, pinNumber) {
+      const comment = comments[captureId][index];
+      const rect = pinElement.getBoundingClientRect();
+
+      const popover = createCommentPopover(comment.text, comment.reference, (text, reference) => {
+        comments[captureId][index].text = text;
+        comments[captureId][index].reference = reference;
+        saveComments();
+        closeActivePopover();
+        renderGrid();
+      }, () => {
+        closeActivePopover();
+      });
+
+      positionPopover(popover, rect.left + rect.width / 2, rect.top);
+      document.body.appendChild(popover);
+      activePopover = { element: popover, captureId, pinIndex: index };
+
+      setTimeout(() => {
+        popover.querySelector('.comment-input').focus();
+      }, 50);
+    }
+
+    function createCommentPopover(initialText, initialReference, onSubmit, onCancel) {
+      const popover = document.createElement('div');
+      popover.className = 'comment-popover';
+
+      let reference = initialReference;
+
+      // Expose a way to check for unsaved content
+      popover.getUnsavedState = () => {
+        const input = popover.querySelector('.comment-input');
+        const currentText = input ? input.value.trim() : '';
+        return { hasText: currentText.length > 0, hasImage: reference !== null };
+      };
+
+      popover.innerHTML = `
+        <div class="comment-popover-content">
+          <textarea class="comment-input" placeholder="Add a comment..." rows="1">${initialText}</textarea>
+          <div class="reference-preview" style="${reference ? '' : 'display: none;'}">
+            <img src="${reference || ''}" alt="Reference">
+            <button class="remove-reference">&times;</button>
+          </div>
+        </div>
+        <div class="comment-popover-footer">
+          <div class="popover-actions">
+            <button class="popover-action-btn add-image-btn" title="Add image">${icons.image}</button>
+          </div>
+          <button class="submit-btn" title="Submit">${icons.arrowUp}</button>
+        </div>
+      `;
+
+      const input = popover.querySelector('.comment-input');
+      const submitBtn = popover.querySelector('.submit-btn');
+      const addImageBtn = popover.querySelector('.add-image-btn');
+      const referencePreview = popover.querySelector('.reference-preview');
+      const referenceImg = popover.querySelector('.reference-preview img');
+      const removeRefBtn = popover.querySelector('.remove-reference');
+
+      input.addEventListener('input', () => {
+        input.style.height = 'auto';
+        input.style.height = Math.min(input.scrollHeight, 150) + 'px';
+        hasUnsavedChanges = true;
+        dismissWarningShown = false;
+      });
+
+      const doSubmit = () => {
+        const text = input.value.trim();
+        if (text || reference) {
+          onSubmit(text, reference);
+        }
+      };
+
+      submitBtn.addEventListener('click', doSubmit);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          doSubmit();
+        }
+        if (e.key === 'Escape') {
+          onCancel();
+        }
+      });
+
+      input.addEventListener('paste', async (e) => {
+        const items = e.clipboardData.items;
+        for (const item of items) {
+          if (item.type.startsWith('image/')) {
+            e.preventDefault();
+            const blob = item.getAsFile();
+            reference = await blobToDataUrl(blob);
+            referenceImg.src = reference;
+            referencePreview.style.display = '';
+            hasUnsavedChanges = true;
+            dismissWarningShown = false;
+            break;
+          }
+        }
+      });
+
+      addImageBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        ignoreNextClick = true;
+        referenceInput.onchange = async (ev) => {
+          if (ev.target.files.length > 0) {
+            reference = await blobToDataUrl(ev.target.files[0]);
+            referenceImg.src = reference;
+            referencePreview.style.display = '';
+            hasUnsavedChanges = true;
+            dismissWarningShown = false;
+          }
+          referenceInput.value = '';
+        };
+        referenceInput.click();
+      });
+
+      removeRefBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        reference = null;
+        referencePreview.style.display = 'none';
+        hasUnsavedChanges = true;
+        dismissWarningShown = false;
+      });
+
+      referenceImg.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (reference) {
+          showImagePreview(reference);
+        }
+      });
+
+      return popover;
+    }
+
+    function createExistingPopover(comment, pinNumber, onEdit, onDelete) {
+      const popover = document.createElement('div');
+      popover.className = 'comment-popover';
+
+      popover.innerHTML = `
+        <div class="existing-comment-content">
+          <div class="existing-comment-text">${escapeHtml(comment.text) || '<span style="color: var(--text-muted);">No text</span>'}</div>
+          ${comment.reference ? `
+            <div class="existing-comment-reference">
+              <img src="${comment.reference}" alt="Reference">
+            </div>
+          ` : ''}
+        </div>
+        <div class="existing-comment-footer">
+          <span class="comment-meta">Pin #${pinNumber}</span>
+          <div class="comment-actions-row">
+            <button class="comment-action-btn edit-btn">Edit</button>
+            <button class="comment-action-btn delete delete-btn">Delete</button>
+          </div>
+        </div>
+      `;
+
+      popover.querySelector('.edit-btn').addEventListener('click', onEdit);
+      popover.querySelector('.delete-btn').addEventListener('click', onDelete);
+
+      const refImg = popover.querySelector('.existing-comment-reference img');
+      if (refImg && comment.reference) {
+        refImg.addEventListener('click', (e) => {
+          e.stopPropagation();
+          showImagePreview(comment.reference);
+        });
+      }
+
+      return popover;
+    }
+
+    function positionPopover(popover, x, y) {
+      popover.style.position = 'fixed';
+
+      let left = x + 16;
+      let top = y - 30;
+
+      popover.style.visibility = 'hidden';
+      document.body.appendChild(popover);
+      const rect = popover.getBoundingClientRect();
+      popover.remove();
+      popover.style.visibility = '';
+
+      if (left + rect.width > window.innerWidth - 20) {
+        left = x - rect.width - 16;
+      }
+      if (top + rect.height > window.innerHeight - 20) {
+        top = window.innerHeight - rect.height - 20;
+      }
+      if (top < 20) {
+        top = 20;
+      }
+      if (left < 20) {
+        left = 20;
+      }
+
+      popover.style.left = `${left}px`;
+      popover.style.top = `${top}px`;
+    }
+
+    function closeActivePopover() {
+      if (activePopover) {
+        activePopover.element.remove();
+        activePopover = null;
+      }
+      if (pendingPin) {
+        pendingPin.tempPin.remove();
+        pendingPin = null;
+      }
+      hasUnsavedChanges = false;
+      dismissWarningShown = false;
+    }
+
+    document.addEventListener('click', (e) => {
+      // Don't handle clicks when image preview is open
+      if (imagePreviewModal.classList.contains('visible')) return;
+
+      // Ignore clicks triggered by file dialog
+      if (ignoreNextClick) {
+        ignoreNextClick = false;
+        return;
+      }
+
+      if (activePopover && !e.target.closest('.comment-popover') && !e.target.closest('.pin') && !e.target.closest('.screenshot-area')) {
+        const state = activePopover.element.getUnsavedState ? activePopover.element.getUnsavedState() : { hasText: false, hasImage: false };
+        const hasContent = state.hasText || state.hasImage;
+        if (hasContent && !dismissWarningShown) {
+          // First click with unsaved changes - shake to warn
+          activePopover.element.classList.add('shake');
+          setTimeout(() => {
+            if (activePopover) {
+              activePopover.element.classList.remove('shake');
+            }
+          }, 400);
+          dismissWarningShown = true;
+        } else {
+          // No unsaved changes, or second click after warning - dismiss
+          closeActivePopover();
+        }
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (imagePreviewModal.classList.contains('visible')) {
+          hideImagePreview();
+        } else if (commentsModal.classList.contains('visible')) {
+          commentsModal.classList.remove('visible');
+        } else if (exportModal.classList.contains('visible')) {
+          exportModal.classList.remove('visible');
+        } else if (activePopover) {
+          const state = activePopover.element.getUnsavedState ? activePopover.element.getUnsavedState() : { hasText: false, hasImage: false };
+          const hasContent = state.hasText || state.hasImage;
+          if (hasContent && !dismissWarningShown) {
+            activePopover.element.classList.add('shake');
+            setTimeout(() => {
+              if (activePopover) {
+                activePopover.element.classList.remove('shake');
+              }
+            }, 400);
+            dismissWarningShown = true;
+          } else {
+            closeActivePopover();
+          }
+        }
+      }
+    });
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function blobToDataUrl(blob) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    // Clear feedback
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      const totalComments = Object.values(comments).reduce((sum, arr) => sum + arr.length, 0);
+      if (totalComments === 0) return;
+
+      if (confirm(`Clear all ${totalComments} comment${totalComments !== 1 ? 's' : ''}?`)) {
+        comments = {};
+        localStorage.removeItem(storageKey());
+        closeActivePopover();
+        renderGrid();
+        updateCounts();
+      }
+    });
+
+    // Export
+    document.getElementById('export-btn').addEventListener('click', doExport);
+
+    async function doExport() {
+      const feedback = {
+        exportedAt: new Date().toISOString(),
+        captures: []
+      };
+
+      // Iterate in manifest order to maintain global pin numbering
+      for (let idx = 0; idx < manifest.captures.length; idx++) {
+        const capture = manifest.captures[idx];
+        const captureId = getCaptureId(idx);
+        const captureComments = comments[captureId];
+
+        if (!captureComments || captureComments.length === 0) continue;
+
+        const pins = [];
+        for (let i = 0; i < captureComments.length; i++) {
+          const comment = captureComments[i];
+          const globalPin = getGlobalPinNumber(captureId, i);
+
+          const pin = {
+            number: globalPin,
+            x: Math.round(comment.x),
+            y: Math.round(comment.y),
+            comment: comment.text
+          };
+
+          if (comment.reference) {
+            const filename = `${captureId}-${globalPin}.png`;
+            try {
+              await fetch('/api/references', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ filename, dataUrl: comment.reference })
+              });
+              pin.reference = `references/${filename}`;
+            } catch (e) {
+              console.error('Failed to save reference:', e);
+            }
+          }
+
+          pins.push(pin);
+        }
+
+        // Generate annotated image with global pin numbers
+        const imageBasename = capture.image.split('/').pop();
+        const annotatedFilename = imageBasename;
+        const commentsWithGlobalPins = captureComments.map((c, i) => ({
+          ...c,
+          pin: getGlobalPinNumber(captureId, i)
+        }));
+        const annotatedDataUrl = await generateAnnotatedImage(capture, commentsWithGlobalPins);
+        try {
+          await fetch('/api/annotated', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filename: annotatedFilename, dataUrl: annotatedDataUrl })
+          });
+        } catch (e) {
+          console.error('Failed to save annotated image:', e);
+        }
+
+        feedback.captures.push({
+          image: imageBasename,
+          annotated: `annotated/${annotatedFilename}`,
+          pins
+        });
+      }
+
+      try {
+        await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(feedback)
+        });
+      } catch (e) {
+        console.error('Failed to save feedback:', e);
+      }
+
+      const capturesWithComments = feedback.captures.length;
+
+      if (capturesWithComments === 0) {
+        exportSummary.innerHTML = `
+          <div class="export-item" style="color: var(--text-muted);">
+            No comments to save. Click on screenshots to add feedback first.
+          </div>
+        `;
+      } else {
+        const totalPins = feedback.captures.reduce((sum, c) => sum + c.pins.length, 0);
+        exportSummary.innerHTML = `
+          <div class="export-item">
+            <span class="check">✓</span>
+            <span>${totalPins} pin${totalPins !== 1 ? 's' : ''} across ${capturesWithComments} capture${capturesWithComments !== 1 ? 's' : ''}</span>
+          </div>
+          <div style="margin-top: 8px; color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
+            Annotated screenshots and feedback.json saved to <code style="font-family: 'SF Mono', Monaco, monospace; font-size: 12px; background: var(--bg-tertiary); padding: 1px 5px; border-radius: 3px;">.crit/</code>
+          </div>
+        `;
+      }
+
+      exportModal.classList.add('visible');
+    }
+
+    async function generateAnnotatedImage(capture, captureComments) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const styles = getComputedStyle(document.documentElement);
+      const pinColor = styles.getPropertyValue('--pin-color').trim();
+      const fallbackBg = styles.getPropertyValue('--canvas-fallback-bg').trim();
+
+      try {
+        const img = await loadImage('/' + capture.image);
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        ctx.drawImage(img, 0, 0);
+      } catch {
+        canvas.width = 390;
+        canvas.height = 844;
+        ctx.fillStyle = fallbackBg;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      captureComments.forEach(comment => {
+        const x = (comment.x / 100) * canvas.width;
+        const y = (comment.y / 100) * canvas.height;
+
+        // Draw teardrop pin (circle with pointed bottom-left)
+        const r = 16;
+        ctx.beginPath();
+        ctx.arc(x + r, y - r, r, Math.PI / 2, Math.PI, true);
+        ctx.lineTo(x, y);
+        ctx.closePath();
+        ctx.fillStyle = pinColor;
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 13px -apple-system, BlinkMacSystemFont, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(comment.pin.toString(), x + r, y - r);
+      });
+
+      return canvas.toDataURL('image/png');
+    }
+
+    function loadImage(src) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    }
+
+    document.getElementById('close-export-modal').addEventListener('click', () => {
+      exportModal.classList.remove('visible');
+    });
+
+    document.getElementById('done-btn').addEventListener('click', () => {
+      exportModal.classList.remove('visible');
+    });
+
+    document.getElementById('copy-command').addEventListener('click', () => {
+      navigator.clipboard.writeText('review .crit and fix each issue');
+      document.getElementById('copy-command').textContent = 'Copied!';
+      setTimeout(() => {
+        document.getElementById('copy-command').textContent = 'Copy';
+      }, 2000);
+    });
+
+    exportModal.addEventListener('click', (e) => {
+      if (e.target === exportModal) {
+        exportModal.classList.remove('visible');
+      }
+    });
+
+    // Theme toggle
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('crit-theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('crit-theme', 'dark');
+      }
+    });
+
+    // Sync with system preference when no manual override
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+      if (localStorage.getItem('crit-theme')) return;
+      if (e.matches) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+    });
+
+    // Eye tracking
+    (function () {
+      var pupils = document.getElementById('logo-pupils');
+      var logo = document.querySelector('.logo svg');
+      if (!pupils || !logo || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var lx = 0, ly = 0;
+      document.addEventListener('mousemove', function (e) {
+        var r = logo.getBoundingClientRect();
+        var dx = e.clientX - (r.left + r.width / 2);
+        var dy = e.clientY - (r.top + r.height / 2);
+        var tx = Math.abs(dx) < 20 ? 0 : (dx > 0 ? 1 : -1);
+        var ty = Math.abs(dy) < 15 ? 0 : (dy > 0 ? 1 : -1);
+        if (tx !== lx || ty !== ly) {
+          pupils.setAttribute('transform', 'translate(' + tx + ',' + ty + ')');
+          lx = tx; ly = ty;
+        }
+      });
+      document.addEventListener('mouseleave', function () {
+        pupils.setAttribute('transform', 'translate(0,0)');
+        lx = 0; ly = 0;
+      });
+    })();
+
+    fetchManifest();
+  </script>
+</body>
+</html>

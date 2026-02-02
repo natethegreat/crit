@@ -1,0 +1,43 @@
+{
+  "name": "crit-ios",
+  "version": "0.1.0",
+  "description": "Visual QA for iOS apps. Capture screenshots from your iOS app, pin feedback, and hand it off to your coding agent.",
+  "bin": {
+    "crit": "bin/crit.js"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/natethegreat/crit.git"
+  },
+  "keywords": [
+    "ios",
+    "simulator",
+    "screenshot",
+    "qa",
+    "visual-review",
+    "design-review",
+    "ui-feedback",
+    "mobile",
+    "xcode"
+  ],
+  "author": "Nate Smith",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/natethegreat/crit/issues"
+  },
+  "homepage": "https://natethegreat.github.io/crit/",
+  "files": [
+    "bin/",
+    "lib/",
+    "server.js",
+    "review-ui.html",
+    "README.md",
+    "LICENSE"
+  ]
+}

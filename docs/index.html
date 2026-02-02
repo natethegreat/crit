@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crit — Visual QA for iOS apps, built for coding agents</title>
+  <meta name="description" content="Visual QA for iOS apps. Capture screenshots from your iOS app, pin feedback, and hand it off to your coding agent.">
+  <meta property="og:title" content="Crit — Visual QA for iOS apps, built for coding agents">
+  <meta property="og:description" content="Capture screenshots from your iOS app, pin feedback, and hand it off to your coding agent.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://natethegreat.github.io/crit/">
+  <meta property="og:image" content="https://natethegreat.github.io/crit/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Crit — Visual QA for iOS apps, built for coding agents">
+  <meta name="twitter:description" content="Capture screenshots from your iOS app, pin feedback, and hand it off to your coding agent.">
+  <meta name="twitter:image" content="https://natethegreat.github.io/crit/og.png">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <style>
+    :root {
+      --bg-primary: #f9f9fb;
+      --bg-tertiary: #f4f4f5;
+      --text-primary: #111111;
+      --text-secondary: #555555;
+      --text-muted: #888888;
+      --accent: #E60023;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0a0a0a;
+      --bg-tertiary: #1a1a1a;
+      --text-primary: #f5f5f5;
+      --text-secondary: #999999;
+      --text-muted: #666666;
+      --accent: #E60023;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .page {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Nav */
+    nav {
+      padding: 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-mark {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-link {
+      font-size: 14px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .nav-link:hover {
+      color: var(--text-secondary);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 80px 0 64px;
+    }
+
+    .hero-title {
+      font-size: 28px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+
+    .hero-desc {
+      font-size: 16px;
+      color: var(--text-secondary);
+      max-width: 540px;
+      line-height: 1.7;
+    }
+
+    /* Install */
+    .install {
+      padding: 0 0 40px;
+    }
+
+    .install-box {
+      background: var(--bg-tertiary);
+      border-radius: 8px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .install-cmd {
+      font-family: "SF Mono", Monaco, monospace;
+      font-size: 14px;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .install-cmd .prompt {
+      color: var(--text-muted);
+      user-select: none;
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      padding: 6px 0;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-family: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .install-alt {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .install-alt code {
+      font-family: "SF Mono", Monaco, monospace;
+      font-size: 12px;
+      color: var(--text-secondary);
+      background: var(--bg-tertiary);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    /* Video */
+    .video-section {
+      padding: 0 0 72px;
+    }
+
+    .video-container {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .video-container video {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    /* Quick start */
+    .quickstart {
+      padding: 0 0 72px;
+    }
+
+    .quickstart-heading {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .quickstart-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .quickstart-step {
+      display: flex;
+      gap: 12px;
+      align-items: baseline;
+    }
+
+    .quickstart-num {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .quickstart-text {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .quickstart-text code {
+      font-family: "SF Mono", Monaco, monospace;
+      font-size: 13px;
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
+    /* FAQ */
+    .faq {
+      padding: 0 0 72px;
+    }
+
+    .faq-heading {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .faq-item {
+      margin-bottom: 20px;
+    }
+
+    .faq-q {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .faq-a {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      padding: 32px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .footer-left {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .footer-left a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    .footer-left a:hover {
+      color: var(--text-primary);
+    }
+
+    .footer-right {
+      font-size: 13px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 20px;
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+      background: none;
+      border: none;
+      border-radius: 6px;
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: color 0.15s, border-color 0.15s;
+      position: relative;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text-secondary);
+    }
+
+    .theme-toggle svg {
+      width: 16px;
+      height: 16px;
+      position: absolute;
+      transition: opacity 0.2s, transform 0.3s;
+    }
+
+    .theme-toggle .icon-sun {
+      opacity: 0;
+      transform: rotate(90deg) scale(0.5);
+    }
+
+    .theme-toggle .icon-moon {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+
+    [data-theme="dark"] .theme-toggle .icon-sun {
+      opacity: 1;
+      transform: rotate(0deg) scale(1);
+    }
+
+    [data-theme="dark"] .theme-toggle .icon-moon {
+      opacity: 0;
+      transform: rotate(-90deg) scale(0.5);
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Logo animation */
+    .nav-mark .logo-brow {
+      opacity: 0;
+      transform: translateY(2px);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .nav-mark:hover .logo-brow {
+        opacity: 1;
+        animation: raise-brow 0.15s steps(2) forwards;
+      }
+
+      @keyframes raise-brow {
+        from { transform: translateY(2px); }
+        to { transform: translateY(-2px); }
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 640px) {
+      .hero {
+        padding: 56px 0 48px;
+      }
+
+      footer {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    /* Fade in */
+    @media (prefers-reduced-motion: no-preference) {
+      .page {
+        animation: fadeIn 0.4s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+    }
+  </style>
+  <script>
+    // Theme initialization — runs before paint to prevent flash
+    (function() {
+      var stored = localStorage.getItem('crit-theme');
+      if (stored) {
+        if (stored === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="page">
+    <nav>
+      <span class="nav-mark"><svg width="32" height="20" viewBox="0 0 13 8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="overflow:visible"><path fill="currentColor" d="M1,0h4v1h-4zM0,1h1v6h-1zM5,1h1v4h-1zM4,5h1v1h-1zM3,6h1v1h-1zM1,7h2v1h-2zM8,0h4v1h-4zM7,1h1v4h-1zM12,1h1v6h-1zM8,5h1v1h-1zM9,6h1v1h-1zM10,7h2v1h-2z"/><path style="fill:var(--bg-primary)" d="M1,1h4v1h-4zM1,2h4v2h-4zM1,4h4v1h-4zM1,5h3v1h-3zM1,6h2v1h-2zM8,1h4v1h-4zM8,2h4v2h-4zM8,4h4v1h-4zM9,5h3v1h-3zM10,6h2v1h-2z"/><g id="logo-pupils"><path fill="currentColor" d="M2,2h2v2h-2zM9,2h2v2h-2z"/></g><path class="logo-brow" fill="currentColor" d="M1,-1h4v1h-4z"/></svg>Crit</span>
+      <div class="nav-right">
+        <a class="nav-link" href="https://www.npmjs.com/package/crit-ios">v0.1.0</a>
+        <a class="nav-link" href="https://github.com/natethegreat/crit">GitHub</a>
+        <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <h1 class="hero-title">Visual QA for iOS apps,<br>built for coding agents</h1>
+      <p class="hero-desc">
+        Capture screenshots from your iOS app, pin feedback, and hand it off to your coding agent.
+      </p>
+    </section>
+
+    <section class="install">
+      <div class="install-box">
+        <code class="install-cmd"><span class="prompt">$ </span>npm install -g crit-ios</code>
+        <button class="copy-btn" id="copy-btn">Copy</button>
+      </div>
+      <p class="install-alt">or run directly: <code>npx crit-ios capture</code></p>
+      <p class="install-alt">Requires macOS with Xcode and iOS Simulator.</p>
+    </section>
+
+    <section class="video-section">
+      <div class="video-container">
+        <video autoplay muted loop playsinline>
+          <source src="demo.mp4" type="video/mp4">
+        </video>
+      </div>
+    </section>
+
+    <section class="quickstart">
+      <h2 class="quickstart-heading">Quick start</h2>
+      <div class="quickstart-steps">
+        <div class="quickstart-step">
+          <span class="quickstart-num">1.</span>
+          <p class="quickstart-text">Capture screenshots from iOS Simulator — <code>crit capture</code></p>
+        </div>
+        <div class="quickstart-step">
+          <span class="quickstart-num">2.</span>
+          <p class="quickstart-text">Review in browser, click to add comments — <code>crit serve</code></p>
+        </div>
+        <div class="quickstart-step">
+          <span class="quickstart-num">3.</span>
+          <p class="quickstart-text">Save, then tell your agent: <code>review .crit and fix each issue</code></p>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq">
+      <h2 class="faq-heading">FAQ</h2>
+      <div class="faq-item">
+        <p class="faq-q">Does this work with Android?</p>
+        <p class="faq-a">Not yet. Crit currently targets iOS Simulator on macOS. Android support is on the radar.</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">Which coding agents does it work with?</p>
+        <p class="faq-a">Any agent that can read images and JSON — Claude Code, Codex, Gemini, Cursor, etc. No lock-in.</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">What happens to my previous session?</p>
+        <p class="faq-a">Each <code style="font-size:13px;background:var(--bg-tertiary);padding:2px 6px;border-radius:4px;">crit capture</code> starts fresh — it replaces the previous session. Save your feedback before recapturing.</p>
+      </div>
+      <div class="faq-item">
+        <p class="faq-q">Does it have any dependencies?</p>
+        <p class="faq-a">Zero npm dependencies. Just vanilla Node.js and a single-file browser UI.</p>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-left" style="display:flex;align-items:center;gap:8px;">
+        <a href="https://github.com/natethegreat/crit">GitHub</a>
+        <span style="color:var(--text-muted);">&middot;</span>
+        <a href="https://www.npmjs.com/package/crit-ios">npm</a>
+      </div>
+      <div class="footer-right">
+        <span>MIT License</span>
+        <span>Built by <a href="https://x.com/nathanael_smith" style="color:var(--accent);text-decoration:none;">Nate Smith</a> &amp; Claude Code</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('copy-btn').addEventListener('click', function () {
+      navigator.clipboard.writeText('npm install -g crit-ios').then(function () {
+        var btn = document.getElementById('copy-btn');
+        btn.textContent = 'Copied';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 2000);
+      });
+    });
+
+    // Theme toggle
+    document.getElementById('theme-toggle').addEventListener('click', function () {
+      var isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      if (isDark) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('crit-theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('crit-theme', 'dark');
+      }
+    });
+
+    // Sync with system preference when no manual override
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+      if (localStorage.getItem('crit-theme')) return;
+      if (e.matches) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+    });
+
+    // Eye tracking
+    (function () {
+      var pupils = document.getElementById('logo-pupils');
+      var logo = document.querySelector('.nav-mark svg');
+      if (!pupils || !logo || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var lx = 0, ly = 0;
+      document.addEventListener('mousemove', function (e) {
+        var r = logo.getBoundingClientRect();
+        var dx = e.clientX - (r.left + r.width / 2);
+        var dy = e.clientY - (r.top + r.height / 2);
+        var tx = Math.abs(dx) < 20 ? 0 : (dx > 0 ? 1 : -1);
+        var ty = Math.abs(dy) < 15 ? 0 : (dy > 0 ? 1 : -1);
+        if (tx !== lx || ty !== ly) {
+          pupils.setAttribute('transform', 'translate(' + tx + ',' + ty + ')');
+          lx = tx; ly = ty;
+        }
+      });
+      document.addEventListener('mouseleave', function () {
+        pupils.setAttribute('transform', 'translate(0,0)');
+        lx = 0; ly = 0;
+      });
+    })();
+  </script>
+</body>
+</html>

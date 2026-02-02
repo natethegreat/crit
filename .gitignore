@@ -1,0 +1,5 @@
+.crit/
+.DS_Store
+node_modules/
+docs/demo-2x.mp4
+docs/demo.gif

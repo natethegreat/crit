@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 13 8" shape-rendering="crispEdges">
+  <style>
+    .o { fill: #1a1a1e; }
+    .s { fill: #ffffff; }
+    @media (prefers-color-scheme: dark) {
+      .o { fill: #fafafa; }
+      .s { fill: #18181b; }
+    }
+  </style>
+  <path class="o" d="M1,0h4v1h-4zM0,1h1v6h-1zM5,1h1v4h-1zM4,5h1v1h-1zM3,6h1v1h-1zM1,7h2v1h-2zM8,0h4v1h-4zM7,1h1v4h-1zM12,1h1v6h-1zM8,5h1v1h-1zM9,6h1v1h-1zM10,7h2v1h-2z"/>
+  <path class="s" d="M1,1h4v1h-4zM1,2h4v2h-4zM1,4h4v1h-4zM1,5h3v1h-3zM1,6h2v1h-2zM8,1h4v1h-4zM8,2h4v2h-4zM8,4h4v1h-4zM9,5h3v1h-3zM10,6h2v1h-2z"/>
+  <path class="o" d="M3,3h2v2h-2zM10,3h2v2h-2z"/>
+</svg>
