@@ -3,16 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crit — Point at bugs in your app, let AI fix them</title>
-  <meta name="description" content="Visual QA for iOS apps. Capture screenshots from your iOS app, pin feedback, and hand it off to your coding agent.">
-  <meta property="og:title" content="Crit — Point at bugs in your app, let AI fix them">
-  <meta property="og:description" content="Capture screenshots from your iOS app, pin feedback, and hand it off to your coding agent.">
+  <title>Crit — Point at bugs in your app, let AI do the rest</title>
+  <meta name="description" content="Visual QA for iOS apps. Capture screenshots from iOS Simulator, pin what's wrong, and hand structured feedback to any coding agent.">
+  <meta property="og:title" content="Crit — Point at bugs in your app, let AI do the rest">
+  <meta property="og:description" content="Capture screenshots from iOS Simulator, pin what's wrong, and hand structured feedback to any coding agent.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://natethegreat.github.io/crit/">
   <meta property="og:image" content="https://natethegreat.github.io/crit/og.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Crit — Point at bugs in your app, let AI fix them">
-  <meta name="twitter:description" content="Capture screenshots from your iOS app, pin feedback, and hand it off to your coding agent.">
+  <meta name="twitter:title" content="Crit — Point at bugs in your app, let AI do the rest">
+  <meta name="twitter:description" content="Capture screenshots from iOS Simulator, pin what's wrong, and hand structured feedback to any coding agent.">
   <meta name="twitter:image" content="https://natethegreat.github.io/crit/og.png">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <style>
@@ -229,6 +229,35 @@
       border-radius: 4px;
     }
 
+    /* Handoff */
+    .handoff {
+      padding: 0 0 72px;
+    }
+
+    .handoff-heading {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .handoff-text {
+      font-size: 15px;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    .handoff-text code {
+      font-family: "SF Mono", Monaco, monospace;
+      font-size: 13px;
+      color: var(--text-primary);
+      background: var(--bg-tertiary);
+      padding: 2px 7px;
+      border-radius: 4px;
+    }
+
     /* FAQ */
     .faq {
       padding: 0 0 72px;
@@ -414,9 +443,9 @@
     </nav>
 
     <section class="hero">
-      <h1 class="hero-title">Point at bugs in your app,<br>let AI fix them.</h1>
+      <h1 class="hero-title">Point at bugs in your app,<br>let AI do the rest.</h1>
       <p class="hero-desc">
-        Capture screenshots from your iOS app, pin feedback, and hand it off to your coding agent.
+        Capture screenshots from iOS Simulator, pin what's wrong, and hand structured feedback to any coding agent.
       </p>
     </section>
 
@@ -442,17 +471,22 @@
       <div class="quickstart-steps">
         <div class="quickstart-step">
           <span class="quickstart-num">1.</span>
-          <p class="quickstart-text">Capture screenshots from iOS Simulator — <code>crit capture</code></p>
+          <p class="quickstart-text"><strong>Open a new terminal tab</strong> and capture screenshots — <code>crit capture</code></p>
         </div>
         <div class="quickstart-step">
           <span class="quickstart-num">2.</span>
-          <p class="quickstart-text">Review in browser, click to add comments — <code>crit serve</code></p>
+          <p class="quickstart-text">Review in browser, click to pin feedback — <code>crit serve</code></p>
         </div>
         <div class="quickstart-step">
           <span class="quickstart-num">3.</span>
-          <p class="quickstart-text">Save, then tell your agent: <code>review .crit and fix each issue</code></p>
+          <p class="quickstart-text"><strong>Back in your agent</strong>, tell it: <code>review .crit and fix each issue</code></p>
         </div>
       </div>
+    </section>
+
+    <section class="handoff">
+      <h2 class="handoff-heading">What your agent receives</h2>
+      <p class="handoff-text">Crit saves structured JSON and annotated screenshots to <code>.crit/</code> in your project. Any coding agent that can read images — Claude Code, Codex, Gemini, Cursor — can pick it up and act on your feedback. No plugins, no MCP, no lock-in.</p>
     </section>
 
     <section class="faq">
