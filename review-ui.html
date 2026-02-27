@@ -22,6 +22,7 @@
       --badge-color: #E60023;
       --success: #6b6b76;
       --error: #E60023;
+      --critique-color: #2563EB;
       --shadow-pin: drop-shadow(0 2px 6px rgba(0,0,0,0.12));
       --shadow-popover: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
       --overlay-footer: rgba(0,0,0,0.04);
@@ -47,6 +48,7 @@
       --badge-color: #E60023;
       --success: #a1a1aa;
       --error: #E60023;
+      --critique-color: #3B82F6;
       --shadow-pin: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
       --shadow-popover: 0 8px 32px rgba(0,0,0,0.5);
       --overlay-footer: rgba(0,0,0,0.2);
@@ -249,12 +251,36 @@
 
     .screenshot-info {
       padding: 8px 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .screenshot-name {
       font-size: 11px;
       font-weight: 400;
       color: var(--text-muted);
+    }
+
+    .delete-capture-btn {
+      opacity: 0;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      transition: opacity 0.15s, color 0.15s, background 0.15s;
+    }
+
+    .screenshot-card:hover .delete-capture-btn {
+      opacity: 1;
+    }
+
+    .delete-capture-btn:hover {
+      color: var(--error);
+      background: var(--delete-hover-bg);
     }
 
     .screenshot-state {
@@ -288,6 +314,128 @@
 
     .pin:hover .pin-dot {
       transform: scale(1.1);
+    }
+
+    .pin.critique-pin .pin-dot {
+      background: var(--critique-color);
+    }
+
+    .critique-popover {
+      border-top: 3px solid var(--critique-color);
+    }
+
+    .critique-popover-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .critique-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--critique-color);
+    }
+
+    .critique-severity {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .critique-severity.critical {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+    }
+
+    .critique-severity.major {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+    }
+
+    .critique-severity.minor {
+      background: var(--bg-tertiary);
+      color: var(--text-muted);
+    }
+
+    .critique-comment {
+      padding: 12px 16px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-primary);
+    }
+
+    .critique-meta {
+      padding: 8px 16px 12px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .critique-dismiss {
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .critique-dismiss button {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 13px;
+      cursor: pointer;
+      padding: 4px 12px;
+      border-radius: 6px;
+    }
+
+    .critique-dismiss button:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .stat-badge.has-critiques {
+      color: var(--critique-color);
+      font-weight: 500;
+    }
+
+    .critique-toggle {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--critique-color);
+      position: relative;
+    }
+
+    .critique-toggle svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .critique-toggle.hidden-critiques {
+      color: var(--text-muted);
+    }
+
+    .comments-list-pin.critique {
+      background: var(--critique-color);
+    }
+
+    .comments-list-critique-header {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--critique-color);
+      margin-top: 12px;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
     }
 
     /* Comment Popover - Dark theme */
@@ -677,6 +825,27 @@
       opacity: 0.9;
     }
 
+    /* Stop server button */
+    .stop-server-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+    }
+
+    .stop-server-btn:hover {
+      color: var(--error);
+      border-color: var(--error);
+    }
+
+    @keyframes pin-pulse {
+      0%, 100% { transform: translate(0, -100%) scale(1); }
+      50% { transform: translate(0, -100%) scale(1.4); }
+    }
+
     /* Theme toggle */
     .theme-toggle {
       width: 36px;
@@ -773,6 +942,354 @@
       text-align: center;
       padding: 24px;
     }
+
+    /* Critique pin states */
+    .pin.critique-pin.accepted .pin-dot {
+      position: relative;
+    }
+
+    .pin.critique-pin.accepted::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      right: -4px;
+      width: 14px;
+      height: 14px;
+      background: #22c55e;
+      border-radius: 50%;
+      border: 2px solid var(--bg-primary);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M3 6l2 2 4-4' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-size: 10px;
+      background-position: center;
+      background-repeat: no-repeat;
+      z-index: 1;
+    }
+
+    .pin.critique-pin.dismissed {
+      opacity: 0.35;
+    }
+
+    .pin.critique-pin.dismissed .pin-dot {
+      background: var(--text-muted);
+    }
+
+    /* Critique popover actions */
+    .critique-actions {
+      padding: 10px 16px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .critique-note-input {
+      flex: 1;
+      border: 1px solid var(--border);
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-family: inherit;
+      padding: 6px 10px;
+      border-radius: 6px;
+      outline: none;
+    }
+
+    .critique-note-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .critique-note-input:focus {
+      border-color: var(--critique-color);
+    }
+
+    .critique-action-accept,
+    .critique-action-dismiss {
+      width: 32px;
+      height: 32px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+
+    .critique-action-accept {
+      background: #22c55e;
+      color: white;
+    }
+
+    .critique-action-accept:hover {
+      background: #16a34a;
+    }
+
+    .critique-action-dismiss {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+
+    .critique-action-dismiss:hover {
+      background: var(--delete-hover-bg);
+      color: var(--error);
+      border-color: transparent;
+    }
+
+    .critique-action-accept svg,
+    .critique-action-dismiss svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .critique-response-badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .critique-response-badge.accepted {
+      background: rgba(34, 197, 94, 0.1);
+      color: #22c55e;
+    }
+
+    .critique-response-badge.dismissed {
+      background: var(--bg-tertiary);
+      color: var(--text-muted);
+    }
+
+    .critique-note-display {
+      padding: 8px 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-style: italic;
+      border-top: 1px solid var(--border);
+    }
+
+    /* Comments list critique status indicators */
+    .comments-list-item.accepted .comments-list-text {
+      color: var(--text-primary);
+    }
+
+    .comments-list-item.dismissed {
+      opacity: 0.5;
+    }
+
+    .comments-list-item.dismissed .comments-list-text {
+      text-decoration: line-through;
+    }
+
+    .comments-list-status {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .comments-list-status.accepted {
+      color: #22c55e;
+    }
+
+    /* Comments flyout panel */
+    .comments-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 360px;
+      height: 100vh;
+      background: var(--bg-secondary);
+      border-left: 1px solid var(--border);
+      z-index: 150;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.25s ease;
+    }
+
+    .comments-panel.open {
+      transform: translateX(0);
+    }
+
+    .comments-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .comments-panel-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .comments-panel-close {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px;
+      line-height: 1;
+    }
+
+    .comments-panel-close:hover {
+      color: var(--text-primary);
+    }
+
+    .comments-panel-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 0;
+    }
+
+    .panel-comment-item {
+      display: flex;
+      gap: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .panel-comment-item:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .panel-comment-item.highlighted {
+      background: var(--bg-tertiary);
+    }
+
+    .panel-comment-pin {
+      width: 28px;
+      height: 28px;
+      border-radius: 50% 50% 50% 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .panel-comment-pin.user-pin {
+      background: var(--pin-color);
+    }
+
+    .panel-comment-pin.critique-pin {
+      background: var(--critique-color);
+    }
+
+    .panel-comment-pin.critique-pin.dismissed {
+      background: var(--text-muted);
+      opacity: 0.5;
+    }
+
+    .panel-comment-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .panel-comment-screen {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 2px;
+    }
+
+    .panel-comment-text {
+      font-size: 13px;
+      color: var(--text-primary);
+      line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    .panel-comment-text.dismissed {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .panel-comment-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .panel-critique-severity {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+
+    .panel-critique-severity.critical {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+    }
+
+    .panel-critique-severity.major {
+      background: rgba(245, 158, 11, 0.1);
+      color: #f59e0b;
+    }
+
+    .panel-critique-severity.minor {
+      background: var(--bg-tertiary);
+      color: var(--text-muted);
+    }
+
+    .panel-critique-status {
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 3px;
+    }
+
+    .panel-critique-status.accepted {
+      background: rgba(34, 197, 94, 0.1);
+      color: #22c55e;
+    }
+
+    .panel-critique-status.dismissed {
+      background: var(--bg-tertiary);
+      color: var(--text-muted);
+    }
+
+    .panel-section-header {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      padding: 12px 20px 6px;
+    }
+
+    .panel-section-header.critique {
+      color: var(--critique-color);
+    }
+
+    .panel-empty {
+      color: var(--text-muted);
+      text-align: center;
+      padding: 40px 20px;
+      font-size: 13px;
+    }
+
+    /* Adjust main content when panel is open */
+    body.panel-open .main-content {
+      margin-right: 360px;
+    }
   </style>
   <script>
     // Theme initialization — runs before paint to prevent flash
@@ -793,15 +1310,22 @@
       <div class="header-stats">
         <span class="stat-badge" id="states-count">0 captures</span>
         <span class="stat-badge clickable" id="comments-count">0 comments</span>
+        <span class="stat-badge clickable has-critiques" id="critiques-count" style="display:none;">0 critiques</span>
       </div>
     </div>
     <div class="header-right">
+      <button class="btn critique-toggle" id="critique-toggle" title="Toggle AI critiques" style="display:none;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
       <button class="btn theme-toggle" id="theme-toggle" title="Toggle theme">
         <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
         <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
       <button class="btn btn-secondary" id="reset-btn">Clear Comments</button>
       <button class="btn btn-primary" id="export-btn">Save</button>
+      <button class="btn stop-server-btn" id="stop-server-btn" title="Stop server">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      </button>
     </div>
   </header>
 
@@ -845,6 +1369,14 @@
     </div>
   </div>
 
+  <div class="comments-panel" id="comments-panel">
+    <div class="comments-panel-header">
+      <span class="comments-panel-title">Comments</span>
+      <button class="comments-panel-close" id="close-comments-panel">&times;</button>
+    </div>
+    <div class="comments-panel-body" id="comments-panel-body"></div>
+  </div>
+
   <div class="modal-overlay" id="image-preview-modal">
     <div class="image-preview-container">
       <button class="image-preview-close">&times;</button>
@@ -869,6 +1401,39 @@
     let hasUnsavedChanges = false;
     let dismissWarningShown = false;
     let ignoreNextClick = false;
+    let critiqueData = null;
+    let critiquesVisible = localStorage.getItem('crit-critiques-visible') !== 'false';
+    let critiqueResponses = {};
+
+    function critiqueResponsesKey() {
+      const id = manifest && manifest.capturedAt ? manifest.capturedAt : 'unknown';
+      return `crit-critique-responses-${id}`;
+    }
+
+    function loadCritiqueResponses() {
+      const saved = localStorage.getItem(critiqueResponsesKey());
+      if (saved) {
+        critiqueResponses = JSON.parse(saved);
+      }
+    }
+
+    function saveCritiqueResponses() {
+      localStorage.setItem(critiqueResponsesKey(), JSON.stringify(critiqueResponses));
+      updateCounts();
+    }
+
+    function getCritiqueResponse(captureId, issueIndex) {
+      return critiqueResponses[captureId] && critiqueResponses[captureId][issueIndex] || null;
+    }
+
+    function setCritiqueResponse(captureId, issueIndex, status, note) {
+      if (!critiqueResponses[captureId]) {
+        critiqueResponses[captureId] = {};
+      }
+      critiqueResponses[captureId][issueIndex] = { status };
+      if (note) critiqueResponses[captureId][issueIndex].note = note;
+      saveCritiqueResponses();
+    }
 
     function storageKey() {
       const id = manifest && manifest.capturedAt ? manifest.capturedAt : 'unknown';
@@ -896,6 +1461,8 @@
     const referenceInput = document.getElementById('reference-input');
     const imagePreviewModal = document.getElementById('image-preview-modal');
     const imagePreviewImg = document.getElementById('image-preview-img');
+    const critiqueToggle = document.getElementById('critique-toggle');
+    const critiquesCount = document.getElementById('critiques-count');
 
     function showImagePreview(src) {
       imagePreviewImg.src = src;
@@ -920,7 +1487,12 @@
 
     function showCommentsModal() {
       const totalComments = getTotalCommentCount();
-      if (totalComments === 0) {
+      let totalCritiques = 0;
+      if (critiqueData && critiqueData.captures) {
+        Object.values(critiqueData.captures).forEach(arr => { totalCritiques += arr.length; });
+      }
+
+      if (totalComments === 0 && totalCritiques === 0) {
         commentsModalBody.innerHTML = '<div class="comments-list-empty">No comments yet</div>';
       } else {
         let html = '';
@@ -951,6 +1523,39 @@
           });
         }
 
+        // Critique items
+        if (critiqueData && critiqueData.captures && totalCritiques > 0) {
+          html += `<div class="comments-list-critique-header">AI Critique</div>`;
+
+          if (manifest && manifest.captures) {
+            manifest.captures.forEach((capture, index) => {
+              const captureId = getCaptureId(index);
+              const issues = critiqueData.captures[captureId];
+              if (!issues || issues.length === 0) return;
+
+              const filename = capture.image.split('/').pop().replace('.png', '');
+              html += `<div class="comments-list-screen">`;
+              html += `<div class="comments-list-screen-name">${filename}</div>`;
+
+              issues.forEach((issue, i) => {
+                const letter = String.fromCharCode(65 + (i % 26));
+                const resp = getCritiqueResponse(captureId, i);
+                const statusClass = resp ? resp.status : '';
+                const statusLabel = resp ? (resp.status === 'accepted' ? '✓' : resp.status === 'dismissed' ? '✗' : '') : '';
+                html += `
+                  <div class="comments-list-item ${statusClass}">
+                    <div class="comments-list-pin critique">${letter}</div>
+                    <div class="comments-list-text">${escapeHtml(issue.comment)}${resp && resp.note ? ` <em style="color:var(--text-muted);">— ${escapeHtml(resp.note)}</em>` : ''}</div>
+                    ${statusLabel ? `<span class="comments-list-status ${statusClass}">${statusLabel}</span>` : ''}
+                  </div>
+                `;
+              });
+
+              html += `</div>`;
+            });
+          }
+        }
+
         commentsModalBody.innerHTML = html;
       }
 
@@ -958,7 +1563,7 @@
     }
 
     commentsCount.addEventListener('click', () => {
-      showCommentsModal();
+      toggleCommentsPanel();
     });
 
     document.getElementById('close-comments-modal').addEventListener('click', () => {
@@ -973,12 +1578,23 @@
 
     async function fetchManifest() {
       try {
-        const res = await fetch('/api/manifest');
-        manifest = await res.json();
+        const [manifestRes, critiqueRes] = await Promise.all([
+          fetch('/api/manifest'),
+          fetch('/api/critique').catch(() => null)
+        ]);
+        manifest = await manifestRes.json();
+        if (critiqueRes && critiqueRes.ok) {
+          critiqueData = await critiqueRes.json();
+          // Only show critique UI if there are actual issues
+          const hasIssues = critiqueData.captures && Object.values(critiqueData.captures).some(arr => arr.length > 0);
+          if (!hasIssues) critiqueData = null;
+        }
         loading.style.display = 'none';
         loadComments();
+        loadCritiqueResponses();
         renderGrid();
         updateCounts();
+        updateCritiqueUI();
       } catch (e) {
         loading.textContent = 'Failed to load manifest. Is the server running?';
         console.error(e);
@@ -998,6 +1614,31 @@
       statesCount.textContent = `${totalCaptures} capture${totalCaptures !== 1 ? 's' : ''}`;
       commentsCount.textContent = `${totalComments} comment${totalComments !== 1 ? 's' : ''}`;
       commentsCount.classList.toggle('has-comments', totalComments > 0);
+
+      if (critiqueData && critiqueData.captures) {
+        let totalCritiques = 0;
+        let acceptedCount = 0;
+        let dismissedCount = 0;
+        Object.entries(critiqueData.captures).forEach(([captureId, arr]) => {
+          totalCritiques += arr.length;
+          arr.forEach((_, i) => {
+            const resp = getCritiqueResponse(captureId, i);
+            if (resp) {
+              if (resp.status === 'accepted') acceptedCount++;
+              else if (resp.status === 'dismissed') dismissedCount++;
+            }
+          });
+        });
+        if (totalCritiques > 0) {
+          const resolved = acceptedCount + dismissedCount;
+          if (resolved > 0) {
+            critiquesCount.textContent = `${resolved}/${totalCritiques} critiques resolved`;
+          } else {
+            critiquesCount.textContent = `${totalCritiques} critique${totalCritiques !== 1 ? 's' : ''}`;
+          }
+          critiquesCount.style.display = '';
+        }
+      }
     }
 
     function getCaptureId(index) {
@@ -1028,6 +1669,28 @@
 
     function getTotalCommentCount() {
       return Object.values(comments).reduce((sum, arr) => sum + arr.length, 0);
+    }
+
+    async function deleteCapture(index) {
+      try {
+        const res = await fetch(`/api/capture/${index}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (!data.success) {
+          console.error('Delete failed:', data.error);
+          return;
+        }
+        // Remove associated comments
+        const captureId = getCaptureId(index);
+        delete comments[captureId];
+        // Reload manifest and re-render
+        const manifestRes = await fetch('/api/manifest');
+        manifest = await manifestRes.json();
+        closeActivePopover();
+        renderGrid();
+        renderCommentsPanel();
+      } catch (e) {
+        console.error('Delete failed:', e);
+      }
     }
 
     function renderGrid() {
@@ -1064,8 +1727,19 @@
         </div>
         <div class="screenshot-info">
           <div class="screenshot-name">${filename}</div>
+          <button class="delete-capture-btn" title="Delete screenshot" data-index="${index}">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+              <path d="M2 4h12M5.33 4V2.67a1.33 1.33 0 011.34-1.34h2.66a1.33 1.33 0 011.34 1.34V4M6.67 7.33v4M9.33 7.33v4"/>
+              <path d="M3.33 4l.67 9.33a1.33 1.33 0 001.33 1.34h5.34a1.33 1.33 0 001.33-1.34L12.67 4"/>
+            </svg>
+          </button>
         </div>
       `;
+
+      card.querySelector('.delete-capture-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        deleteCapture(index);
+      });
 
       const screenshotArea = card.querySelector('.screenshot-area');
 
@@ -1075,6 +1749,16 @@
         const pin = createPinElement(comment.x, comment.y, i, captureId, globalNum);
         screenshotArea.appendChild(pin);
       });
+
+      // Add critique pins (blue, lettered)
+      if (critiqueData && critiqueData.captures && critiqueData.captures[captureId] && critiquesVisible) {
+        critiqueData.captures[captureId].forEach((issue, i) => {
+          const letter = String.fromCharCode(65 + (i % 26));
+          const response = getCritiqueResponse(captureId, i);
+          const pin = createCritiquePinElement(issue.x, issue.y, letter, issue, captureId, i, response);
+          screenshotArea.appendChild(pin);
+        });
+      }
 
       screenshotArea.addEventListener('click', (e) => {
         if (e.target.closest('.pin')) return;
@@ -1561,6 +2245,32 @@
         });
       }
 
+      // Add accepted critiques
+      feedback.critiques = [];
+      if (critiqueData && critiqueData.captures) {
+        for (const [captureId, issues] of Object.entries(critiqueData.captures)) {
+          const captureIndex = parseInt(captureId.split('-')[1]);
+          const capture = manifest.captures[captureIndex];
+          if (!capture) continue;
+
+          issues.forEach((issue, i) => {
+            const resp = getCritiqueResponse(captureId, i);
+            if (resp && resp.status === 'accepted') {
+              const entry = {
+                image: capture.image.split('/').pop(),
+                comment: issue.comment,
+                severity: issue.severity || 'minor',
+                category: issue.category || null,
+                x: Math.round(issue.x),
+                y: Math.round(issue.y)
+              };
+              if (resp.note) entry.note = resp.note;
+              feedback.critiques.push(entry);
+            }
+          });
+        }
+      }
+
       try {
         await fetch('/api/feedback', {
           method: 'POST',
@@ -1573,7 +2283,8 @@
 
       const capturesWithComments = feedback.captures.length;
 
-      if (capturesWithComments === 0) {
+      const totalAccepted = feedback.critiques ? feedback.critiques.length : 0;
+      if (capturesWithComments === 0 && totalAccepted === 0) {
         exportSummary.innerHTML = `
           <div class="export-item" style="color: var(--text-muted);">
             No comments to save. Click on screenshots to add feedback first.
@@ -1581,11 +2292,23 @@
         `;
       } else {
         const totalPins = feedback.captures.reduce((sum, c) => sum + c.pins.length, 0);
-        exportSummary.innerHTML = `
+        const totalAcceptedCritiques = feedback.critiques ? feedback.critiques.length : 0;
+
+        let summaryItems = `
           <div class="export-item">
             <span class="check">✓</span>
             <span>${totalPins} pin${totalPins !== 1 ? 's' : ''} across ${capturesWithComments} capture${capturesWithComments !== 1 ? 's' : ''}</span>
-          </div>
+          </div>`;
+
+        if (totalAcceptedCritiques > 0) {
+          summaryItems += `
+          <div class="export-item">
+            <span class="check">✓</span>
+            <span>${totalAcceptedCritiques} accepted critique${totalAcceptedCritiques !== 1 ? 's' : ''}</span>
+          </div>`;
+        }
+
+        exportSummary.innerHTML = summaryItems + `
           <div style="margin-top: 8px; color: var(--text-secondary); font-size: 13px; line-height: 1.6;">
             Annotated screenshots and feedback.json saved to <code style="font-family: 'SF Mono', Monaco, monospace; font-size: 12px; background: var(--bg-tertiary); padding: 1px 5px; border-radius: 3px;">.crit/</code>
           </div>
@@ -1687,6 +2410,277 @@
         document.documentElement.setAttribute('data-theme', 'dark');
       } else {
         document.documentElement.removeAttribute('data-theme');
+      }
+    });
+
+    // Stop server
+    document.getElementById('stop-server-btn').addEventListener('click', async () => {
+      if (confirm('Stop the crit server?')) {
+        try {
+          await fetch('/api/stop', { method: 'POST' });
+          document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:var(--text-muted);font-family:-apple-system,sans-serif;"><div style="text-align:center;"><p style="font-size:16px;margin-bottom:8px;">Server stopped.</p><p style="font-size:13px;">Run <code>crit serve</code> to start again.</p></div></div>';
+        } catch (e) {
+          // Server already stopped
+        }
+      }
+    });
+
+    // Critique pin functions
+    function createCritiquePinElement(x, y, letter, issue, captureId, issueIndex, response) {
+      const pin = document.createElement('div');
+      let stateClass = '';
+      if (response) {
+        stateClass = response.status === 'accepted' ? ' accepted' : response.status === 'dismissed' ? ' dismissed' : '';
+      }
+      pin.className = `pin critique-pin${stateClass}`;
+      pin.style.left = `${x}%`;
+      pin.style.top = `${y}%`;
+      pin.innerHTML = `<div class="pin-dot">${letter}</div>`;
+
+      pin.addEventListener('click', (e) => {
+        e.stopPropagation();
+        closeActivePopover();
+        showCritiquePopover(issue, letter, pin, captureId, issueIndex);
+      });
+
+      return pin;
+    }
+
+    function showCritiquePopover(issue, letter, pinElement, captureId, issueIndex) {
+      const popover = document.createElement('div');
+      popover.className = 'comment-popover critique-popover';
+
+      const severityClass = (issue.severity || 'minor').toLowerCase();
+      const existingResponse = getCritiqueResponse(captureId, issueIndex);
+      const existingNote = existingResponse ? existingResponse.note || '' : '';
+      const existingStatus = existingResponse ? existingResponse.status : null;
+
+      let headerExtra = '';
+      if (existingStatus === 'accepted') {
+        headerExtra = `<span class="critique-response-badge accepted">Accepted</span>`;
+      } else if (existingStatus === 'dismissed') {
+        headerExtra = `<span class="critique-response-badge dismissed">Dismissed</span>`;
+      }
+
+      popover.innerHTML = `
+        <div class="critique-popover-header">
+          <span class="critique-label">AI Critique &middot; ${letter}</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            ${headerExtra}
+            <span class="critique-severity ${severityClass}">${issue.severity || 'minor'}</span>
+          </div>
+        </div>
+        <div class="critique-comment">${escapeHtml(issue.comment)}</div>
+        ${issue.category ? `<div class="critique-meta">${issue.category}</div>` : ''}
+        ${existingStatus === 'accepted' && existingNote ? `<div class="critique-note-display">"${escapeHtml(existingNote)}"</div>` : ''}
+        <div class="critique-actions">
+          <input class="critique-note-input" type="text" placeholder="Add a note (optional)..." value="${escapeHtml(existingNote)}">
+          <button class="critique-action-accept" title="Accept">
+            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          </button>
+          <button class="critique-action-dismiss" title="Dismiss">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      `;
+
+      const noteInput = popover.querySelector('.critique-note-input');
+
+      popover.querySelector('.critique-action-accept').addEventListener('click', () => {
+        const note = noteInput.value.trim();
+        setCritiqueResponse(captureId, issueIndex, 'accepted', note || undefined);
+        closeActivePopover();
+        renderGrid();
+        renderCommentsPanel();
+      });
+
+      popover.querySelector('.critique-action-dismiss').addEventListener('click', () => {
+        setCritiqueResponse(captureId, issueIndex, 'dismissed');
+        closeActivePopover();
+        renderGrid();
+        renderCommentsPanel();
+      });
+
+      noteInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          const note = noteInput.value.trim();
+          setCritiqueResponse(captureId, issueIndex, 'accepted', note || undefined);
+          closeActivePopover();
+          renderGrid();
+          renderCommentsPanel();
+        }
+        if (e.key === 'Escape') {
+          closeActivePopover();
+        }
+      });
+
+      const rect = pinElement.getBoundingClientRect();
+      positionPopover(popover, rect.left + rect.width / 2, rect.top);
+      document.body.appendChild(popover);
+      activePopover = { element: popover };
+    }
+
+    function updateCritiqueUI() {
+      if (critiqueData) {
+        critiqueToggle.style.display = '';
+        critiqueToggle.classList.toggle('hidden-critiques', !critiquesVisible);
+        critiqueToggle.title = critiquesVisible ? 'Hide AI critiques' : 'Show AI critiques';
+      } else {
+        critiqueToggle.style.display = 'none';
+      }
+    }
+
+    critiqueToggle.addEventListener('click', () => {
+      critiquesVisible = !critiquesVisible;
+      localStorage.setItem('crit-critiques-visible', critiquesVisible);
+      updateCritiqueUI();
+      renderGrid();
+    });
+
+    critiquesCount.addEventListener('click', () => {
+      toggleCommentsPanel();
+    });
+
+    // Comments flyout panel
+    const commentsPanel = document.getElementById('comments-panel');
+    const commentsPanelBody = document.getElementById('comments-panel-body');
+    let panelOpen = false;
+    let highlightedPinEl = null;
+
+    function toggleCommentsPanel() {
+      panelOpen = !panelOpen;
+      commentsPanel.classList.toggle('open', panelOpen);
+      document.body.classList.toggle('panel-open', panelOpen);
+      if (panelOpen) renderCommentsPanel();
+    }
+
+    function renderCommentsPanel() {
+      if (!panelOpen) return;
+
+      const totalComments = getTotalCommentCount();
+      let totalCritiques = 0;
+      if (critiqueData && critiqueData.captures) {
+        Object.values(critiqueData.captures).forEach(arr => { totalCritiques += arr.length; });
+      }
+
+      if (totalComments === 0 && totalCritiques === 0) {
+        commentsPanelBody.innerHTML = '<div class="panel-empty">No comments yet.<br>Click on a screenshot to add one.</div>';
+        return;
+      }
+
+      let html = '';
+
+      // User comments
+      if (totalComments > 0) {
+        html += '<div class="panel-section-header">Comments</div>';
+        if (manifest && manifest.captures) {
+          manifest.captures.forEach((capture, index) => {
+            const captureId = getCaptureId(index);
+            const captureComments = comments[captureId];
+            if (!captureComments || captureComments.length === 0) return;
+            const filename = capture.image.split('/').pop().replace('.png', '');
+
+            captureComments.forEach((comment, i) => {
+              const globalPin = getGlobalPinNumber(captureId, i);
+              html += `
+                <div class="panel-comment-item" data-capture-id="${captureId}" data-pin-index="${i}" data-pin-type="user">
+                  <div class="panel-comment-pin user-pin">${globalPin}</div>
+                  <div class="panel-comment-body">
+                    <div class="panel-comment-screen">${filename}</div>
+                    <div class="panel-comment-text">${escapeHtml(comment.text) || '<em style="color:var(--text-muted)">Image only</em>'}</div>
+                  </div>
+                </div>`;
+            });
+          });
+        }
+      }
+
+      // Critique items
+      if (totalCritiques > 0) {
+        html += '<div class="panel-section-header critique">AI Critique</div>';
+        if (manifest && manifest.captures) {
+          manifest.captures.forEach((capture, index) => {
+            const captureId = getCaptureId(index);
+            const issues = critiqueData && critiqueData.captures ? critiqueData.captures[captureId] : null;
+            if (!issues || issues.length === 0) return;
+            const filename = capture.image.split('/').pop().replace('.png', '');
+
+            issues.forEach((issue, i) => {
+              const letter = String.fromCharCode(65 + (i % 26));
+              const resp = getCritiqueResponse(captureId, i);
+              const statusClass = resp ? resp.status : '';
+              const sevClass = (issue.severity || 'minor').toLowerCase();
+
+              let metaHtml = `<span class="panel-critique-severity ${sevClass}">${issue.severity || 'minor'}</span>`;
+              if (resp) {
+                metaHtml += `<span class="panel-critique-status ${resp.status}">${resp.status}</span>`;
+              }
+
+              html += `
+                <div class="panel-comment-item" data-capture-id="${captureId}" data-pin-index="${i}" data-pin-type="critique">
+                  <div class="panel-comment-pin critique-pin ${statusClass}">${letter}</div>
+                  <div class="panel-comment-body">
+                    <div class="panel-comment-screen">${filename}</div>
+                    <div class="panel-comment-text ${statusClass === 'dismissed' ? 'dismissed' : ''}">${escapeHtml(issue.comment)}</div>
+                    <div class="panel-comment-meta">${metaHtml}</div>
+                  </div>
+                </div>`;
+            });
+          });
+        }
+      }
+
+      commentsPanelBody.innerHTML = html;
+
+      // Add click handlers to scroll to and highlight pins
+      commentsPanelBody.querySelectorAll('.panel-comment-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const captureId = item.dataset.captureId;
+          const pinIndex = parseInt(item.dataset.pinIndex);
+          const pinType = item.dataset.pinType;
+          highlightPinOnCard(captureId, pinIndex, pinType);
+
+          // Highlight the panel item
+          commentsPanelBody.querySelectorAll('.panel-comment-item').forEach(el => el.classList.remove('highlighted'));
+          item.classList.add('highlighted');
+        });
+      });
+    }
+
+    function highlightPinOnCard(captureId, pinIndex, pinType) {
+      // Clear previous highlight
+      if (highlightedPinEl) {
+        highlightedPinEl.style.animation = '';
+        highlightedPinEl = null;
+      }
+
+      // Find the card
+      const card = document.querySelector(`.screenshot-card[data-capture-id="${captureId}"]`);
+      if (!card) return;
+
+      // Scroll to the card
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      // Find the pin
+      const pins = card.querySelectorAll(pinType === 'critique' ? '.pin.critique-pin' : '.pin:not(.critique-pin)');
+      const pin = pins[pinIndex];
+      if (!pin) return;
+
+      // Pulse animation
+      highlightedPinEl = pin;
+      pin.style.animation = 'none';
+      pin.offsetHeight; // force reflow
+      pin.style.animation = 'pin-pulse 0.6s ease-in-out 3';
+    }
+
+    document.getElementById('close-comments-panel').addEventListener('click', () => {
+      panelOpen = false;
+      commentsPanel.classList.remove('open');
+      document.body.classList.remove('panel-open');
+      if (highlightedPinEl) {
+        highlightedPinEl.style.animation = '';
+        highlightedPinEl = null;
       }
     });
 

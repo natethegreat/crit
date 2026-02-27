@@ -1,9 +1,12 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const simulator = require('./lib/simulator');
+const session = require('./lib/session');
 
 const PORT = process.env.PORT || 3847;
-const REVIEW_DIR = path.join(process.env.CRIT_PROJECT_DIR || __dirname, '.crit');
+const PROJECT_DIR = process.env.CRIT_PROJECT_DIR || __dirname;
+const REVIEW_DIR = path.join(PROJECT_DIR, '.crit');
 
 function getLatestSession() {
   const latestPath = path.join(REVIEW_DIR, 'latest');
@@ -79,7 +82,7 @@ function parseBody(req) {
 const server = http.createServer(async (req, res) => {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
@@ -99,18 +102,34 @@ const server = http.createServer(async (req, res) => {
 
   // API routes
   if (pathname === '/api/manifest') {
-    const session = getLatestSession();
-    if (!session) {
-      sendJson(res, { error: 'No session found' }, 404);
+    const sess = getLatestSession();
+    if (!sess) {
+      sendJson(res, { capturedAt: null, captures: [] });
       return;
     }
-    const manifestPath = path.join(session, 'manifest.json');
+    const manifestPath = path.join(sess, 'manifest.json');
     if (!fs.existsSync(manifestPath)) {
-      sendJson(res, { error: 'Manifest not found' }, 404);
+      sendJson(res, { capturedAt: null, captures: [] });
       return;
     }
     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
     sendJson(res, manifest);
+    return;
+  }
+
+  if (pathname === '/api/critique') {
+    const session = getLatestSession();
+    if (!session) {
+      sendJson(res, { captures: {} });
+      return;
+    }
+    const critiquePath = path.join(session, 'critique.json');
+    if (!fs.existsSync(critiquePath)) {
+      sendJson(res, { captures: {} });
+      return;
+    }
+    const critique = JSON.parse(fs.readFileSync(critiquePath, 'utf8'));
+    sendJson(res, critique);
     return;
   }
 
@@ -175,6 +194,57 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  if (pathname === '/api/snap' && req.method === 'POST') {
+    try {
+      const booted = simulator.getBootedSimulator();
+      if (!booted) {
+        sendJson(res, { error: 'No simulator running' }, 400);
+        return;
+      }
+
+      const deviceInfo = simulator.getDeviceInfo();
+      let sess, manifest;
+      const existingSession = getLatestSession();
+
+      if (existingSession) {
+        const manifestPath = path.join(existingSession, 'manifest.json');
+        if (fs.existsSync(manifestPath)) {
+          manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+          sess = {
+            path: existingSession,
+            screenshotsDir: path.join(existingSession, 'screenshots'),
+            critDir: REVIEW_DIR,
+            name: path.basename(existingSession)
+          };
+        }
+      }
+
+      if (!sess) {
+        sess = session.createSession(PROJECT_DIR);
+        manifest = {
+          capturedAt: new Date().toISOString(),
+          device: deviceInfo.name,
+          captures: []
+        };
+      }
+
+      const captureCount = manifest.captures.length + 1;
+      const filename = String(captureCount).padStart(3, '0') + '.png';
+      const outputPath = path.join(sess.screenshotsDir, filename);
+
+      simulator.screenshot(outputPath);
+
+      manifest.captures.push({ image: `screenshots/${filename}` });
+      session.writeManifest(sess.path, manifest);
+      session.updateLatestPointer(sess.critDir, sess.name);
+
+      sendJson(res, { success: true, filename, total: manifest.captures.length });
+    } catch (e) {
+      sendJson(res, { error: e.message }, 500);
+    }
+    return;
+  }
+
   if (pathname.startsWith('/api/references') && req.method === 'POST') {
     const session = getLatestSession();
     if (!session) {
@@ -196,6 +266,46 @@ const server = http.createServer(async (req, res) => {
     } catch (e) {
       sendJson(res, { error: e.message }, 500);
     }
+    return;
+  }
+
+  if (pathname.startsWith('/api/capture/') && req.method === 'DELETE') {
+    const sess = getLatestSession();
+    if (!sess) {
+      sendJson(res, { error: 'No session found' }, 404);
+      return;
+    }
+    const manifestPath = path.join(sess, 'manifest.json');
+    if (!fs.existsSync(manifestPath)) {
+      sendJson(res, { error: 'No manifest found' }, 404);
+      return;
+    }
+    try {
+      const index = parseInt(pathname.split('/').pop(), 10);
+      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+      if (isNaN(index) || index < 0 || index >= manifest.captures.length) {
+        sendJson(res, { error: 'Invalid capture index' }, 400);
+        return;
+      }
+      const removed = manifest.captures.splice(index, 1)[0];
+      session.writeManifest(sess, manifest);
+
+      // Delete the screenshot file
+      const imgPath = path.join(sess, removed.image);
+      if (fs.existsSync(imgPath)) {
+        fs.unlinkSync(imgPath);
+      }
+
+      sendJson(res, { success: true, removed: removed.image });
+    } catch (e) {
+      sendJson(res, { error: e.message }, 500);
+    }
+    return;
+  }
+
+  if (pathname === '/api/stop' && req.method === 'POST') {
+    sendJson(res, { success: true });
+    setTimeout(() => process.exit(0), 100);
     return;
   }
 
