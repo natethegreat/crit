@@ -433,7 +433,7 @@
     <nav>
       <span class="nav-mark"><svg width="32" height="20" viewBox="0 0 13 8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="overflow:visible"><path fill="currentColor" d="M1,0h4v1h-4zM0,1h1v6h-1zM5,1h1v4h-1zM4,5h1v1h-1zM3,6h1v1h-1zM1,7h2v1h-2zM8,0h4v1h-4zM7,1h1v4h-1zM12,1h1v6h-1zM8,5h1v1h-1zM9,6h1v1h-1zM10,7h2v1h-2z"/><path style="fill:var(--bg-primary)" d="M1,1h4v1h-4zM1,2h4v2h-4zM1,4h4v1h-4zM1,5h3v1h-3zM1,6h2v1h-2zM8,1h4v1h-4zM8,2h4v2h-4zM8,4h4v1h-4zM9,5h3v1h-3zM10,6h2v1h-2z"/><g id="logo-pupils"><path fill="currentColor" d="M2,2h2v2h-2zM9,2h2v2h-2z"/></g><path class="logo-brow" fill="currentColor" d="M1,-1h4v1h-4z"/></svg>Crit</span>
       <div class="nav-right">
-        <a class="nav-link" href="https://www.npmjs.com/package/crit-ios">v0.1.0</a>
+        <a class="nav-link" href="https://www.npmjs.com/package/crit-ios" id="npm-version">v0.1.1</a>
         <a class="nav-link" href="https://github.com/natethegreat/crit">GitHub</a>
         <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
           <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
@@ -552,6 +552,16 @@
         document.documentElement.removeAttribute('data-theme');
       }
     });
+
+    // Fetch latest version from npm registry
+    fetch('https://registry.npmjs.org/crit-ios/latest')
+      .then(function(r) { return r.json(); })
+      .then(function(d) {
+        if (d && d.version) {
+          document.getElementById('npm-version').textContent = 'v' + d.version;
+        }
+      })
+      .catch(function() {});
 
     // Eye tracking
     (function () {
