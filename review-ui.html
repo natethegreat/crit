@@ -885,7 +885,7 @@
       opacity: 0.9;
     }
 
-    /* Stop server button */
+    /* (stop server button removed) */
     .stop-server-btn {
       width: 36px;
       height: 36px;
@@ -1383,9 +1383,6 @@
       </button>
       <button class="btn btn-secondary" id="reset-btn">Clear Comments</button>
       <button class="btn btn-primary" id="export-btn">Save</button>
-      <button class="btn stop-server-btn" id="stop-server-btn" title="Stop server">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-      </button>
     </div>
   </header>
 
@@ -1395,7 +1392,7 @@
     <div class="empty-state" id="empty-state">
       <svg width="104" height="64" viewBox="0 0 13 8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="overflow:visible">
         <path fill="currentColor" d="M1,0h4v1h-4zM0,1h1v6h-1zM5,1h1v4h-1zM4,5h1v1h-1zM3,6h1v1h-1zM1,7h2v1h-2zM8,0h4v1h-4zM7,1h1v4h-1zM12,1h1v6h-1zM8,5h1v1h-1zM9,6h1v1h-1zM10,7h2v1h-2z"/>
-        <path style="fill:var(--bg-primary)" d="M1,1h4v1h-4zM1,2h4v2h-4zM1,4h4v1h-4zM1,5h3v1h-3zM1,6h2v1h-2zM8,1h4v1h-4zM8,2h4v2h-4zM8,4h4v1h-4zM9,5h3v1h-3zM10,6h2v1h-2z"/>
+        <path style="fill:var(--bg-secondary)" d="M1,1h4v1h-4zM1,2h4v2h-4zM1,4h4v1h-4zM1,5h3v1h-3zM1,6h2v1h-2zM8,1h4v1h-4zM8,2h4v2h-4zM8,4h4v1h-4zM9,5h3v1h-3zM10,6h2v1h-2z"/>
         <g class="empty-state-pupils"><path fill="currentColor" d="M2,2h2v2h-2zM9,2h2v2h-2z"/></g>
       </svg>
       <div class="empty-state-text">
@@ -2492,17 +2489,6 @@
       }
     });
 
-    // Stop server
-    document.getElementById('stop-server-btn').addEventListener('click', async () => {
-      if (confirm('Stop the crit server?')) {
-        try {
-          await fetch('/api/stop', { method: 'POST' });
-          document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;color:var(--text-muted);font-family:-apple-system,sans-serif;"><div style="text-align:center;"><p style="font-size:16px;margin-bottom:8px;">Server stopped.</p><p style="font-size:13px;">Run <code>crit serve</code> to start again.</p></div></div>';
-        } catch (e) {
-          // Server already stopped
-        }
-      }
-    });
 
     // Critique pin functions
     function createCritiquePinElement(x, y, letter, issue, captureId, issueIndex, response) {
