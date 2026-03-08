@@ -5,6 +5,8 @@
 
 Visual QA for iOS apps. Capture screenshots from your iOS app, pin feedback, and hand it off to your coding agent.
 
+<!-- TODO: add demo GIF here -->
+
 ## Install
 
 ```bash
@@ -31,6 +33,15 @@ npx crit-ios serve
 ```
 
 ## How it works
+
+```mermaid
+flowchart LR
+    A["1. Boot app\nin iOS Simulator"] --> B["2. crit capture\n(press Enter per screen)"]
+    B --> C["3. crit serve\n(opens browser)"]
+    C --> D["4. Pin feedback\n& add comments"]
+    D --> E["5. Save →\nfeedback.json"]
+    E --> F["6. Tell your agent:\n'review .crit\nand fix each issue'"]
+```
 
 1. Boot your app in iOS Simulator
 2. `crit capture` — press Enter to capture each screen, `q` to quit
