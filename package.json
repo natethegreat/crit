@@ -1,6 +1,6 @@
 {
   "name": "crit-ios",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Visual QA for iOS apps. Capture screenshots from your iOS app, pin feedback, and hand it off to your coding agent.",
   "bin": {
     "crit": "bin/crit.js"
