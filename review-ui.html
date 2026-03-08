@@ -206,6 +206,66 @@
       gap: 12px;
     }
 
+    /* Empty state */
+    .empty-state {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 80px 24px;
+      text-align: center;
+    }
+
+    .empty-state.visible {
+      display: flex;
+    }
+
+    .empty-state-text {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .empty-state-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .empty-state-subtitle {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-subtitle code {
+      font-family: inherit;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      @keyframes eye-wander {
+        0%    { transform: translate(0px, 0px); }
+        12.5% { transform: translate(1px, 0px); }
+        25%   { transform: translate(1px, 1px); }
+        37.5% { transform: translate(0px, 1px); }
+        50%   { transform: translate(-1px, 1px); }
+        62.5% { transform: translate(-1px, 0px); }
+        75%   { transform: translate(-1px, -1px); }
+        87.5% { transform: translate(0px, -1px); }
+        100%  { transform: translate(0px, 0px); }
+      }
+
+      .empty-state-pupils {
+        animation: eye-wander 5s steps(1, end) infinite;
+      }
+    }
+
     /* Screenshot Card */
     .screenshot-card {
       background: transparent;
@@ -1332,6 +1392,17 @@
   <main class="main-content" id="main-content">
     <div class="loading" id="loading">Loading screenshots...</div>
     <div id="grid-container"></div>
+    <div class="empty-state" id="empty-state">
+      <svg width="104" height="64" viewBox="0 0 13 8" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" style="overflow:visible">
+        <path fill="currentColor" d="M1,0h4v1h-4zM0,1h1v6h-1zM5,1h1v4h-1zM4,5h1v1h-1zM3,6h1v1h-1zM1,7h2v1h-2zM8,0h4v1h-4zM7,1h1v4h-1zM12,1h1v6h-1zM8,5h1v1h-1zM9,6h1v1h-1zM10,7h2v1h-2z"/>
+        <path style="fill:var(--bg-primary)" d="M1,1h4v1h-4zM1,2h4v2h-4zM1,4h4v1h-4zM1,5h3v1h-3zM1,6h2v1h-2zM8,1h4v1h-4zM8,2h4v2h-4zM8,4h4v1h-4zM9,5h3v1h-3zM10,6h2v1h-2z"/>
+        <g class="empty-state-pupils"><path fill="currentColor" d="M2,2h2v2h-2zM9,2h2v2h-2z"/></g>
+      </svg>
+      <div class="empty-state-text">
+        <div class="empty-state-title">Nothing to review</div>
+        <div class="empty-state-subtitle">Run <code>crit capture</code> to grab some screens</div>
+      </div>
+    </div>
   </main>
 
   <div class="modal-overlay" id="export-modal">
@@ -1696,7 +1767,15 @@
     function renderGrid() {
       if (!manifest || !manifest.captures) return;
 
+      const emptyState = document.getElementById('empty-state');
       gridContainer.innerHTML = '';
+
+      if (manifest.captures.length === 0) {
+        emptyState.classList.add('visible');
+        return;
+      }
+
+      emptyState.classList.remove('visible');
       const grid = document.createElement('div');
       grid.className = 'screenshots-grid';
 

@@ -5,7 +5,7 @@
 
 Visual QA for iOS apps. Capture screenshots from your iOS app, pin feedback, and hand it off to your coding agent.
 
-<!-- TODO: add demo GIF here -->
+<video src="docs/demo.mp4" autoplay loop muted playsinline width="100%"></video>
 
 ## Install
 
